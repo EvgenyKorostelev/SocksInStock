@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.korostelev.controller.payload.NewSockPayload;
 import ru.korostelev.controller.payload.UpdateSockPayload;
 import ru.korostelev.entity.Sock;
@@ -26,11 +25,11 @@ public class SockRestController {
     private final SockServiceImp sockService;
     private final MessageSource messageSource;
 
-    @ModelAttribute("sock")
-    public Sock getSockById(@PathVariable("id") Integer id) {
-        return this.sockService.findSockById(id)
-                .orElseThrow(() -> new NoSuchElementException("catalogue.errors.product.not_found"));
-    }
+//    @ModelAttribute("sock")
+//    public Sock getSockById(@PathVariable("id") Integer id) {
+//        return this.sockService.findSockById(id)
+//                .orElseThrow(() -> new NoSuchElementException("catalogue.errors.product.not_found"));
+//    }
 
     @ModelAttribute("sock")
     public List<Sock> getSockByColor(String color) {
@@ -60,8 +59,7 @@ public class SockRestController {
 //    Увеличивает количество носков на складе.
     @PostMapping("income")
     public ResponseEntity<?> incomeSock(@Valid @RequestBody NewSockPayload payload,
-                                        BindingResult bindingResult,
-                                        UriComponentsBuilder uriComponentsBuilder)
+                                        BindingResult bindingResult)
             throws BindException {
         if (bindingResult.hasErrors()) {
             if (bindingResult instanceof BindException exception) {
@@ -70,12 +68,17 @@ public class SockRestController {
                 throw new BindException(bindingResult);
             }
         } else {
-            Sock sock = this.sockService.createSock(payload.color(), payload.percentageCotton(), payload.pieces());
-            return ResponseEntity
-                    .created(uriComponentsBuilder
-                            .replacePath("/api/socks/{id}")
-                            .build(Map.of("id", sock.getId())))
-                    .body(sock);
+            Optional<Sock> tempSock = getSockByColor(payload.color()).stream().filter(sock ->
+                    Objects.equals(sock.getPercentageCotton(), payload.percentageCotton())).findAny();
+            if (tempSock.isEmpty()) {
+                this.sockService.createSock(
+                        payload.color(), payload.percentageCotton(), payload.pieces());
+            } else {
+                this.sockService.updateSock(tempSock.get().getId(), payload.color(), payload.percentageCotton(),
+                        tempSock.get().getPieces() + payload.pieces());
+            }
+            return ResponseEntity.noContent()
+                    .build();
         }
     }
 
@@ -131,7 +134,7 @@ public class SockRestController {
 //    Принимает Excel или CSV (один формат на выбор) файл с партиями носков, содержащими цвет,
 //    процентное содержание хлопка и количество.
     @PostMapping("batch")
-    public ResponseEntity<?> loadingBatches(@RequestParam(name = "path", required = false) String path) {
+    public ResponseEntity<?> loadingBatches(@RequestParam(name = "path") String path) {
         try {
             sockService.loadingBatchesSocksFromFile(path);
             return new ResponseEntity<>(HttpStatus.OK);

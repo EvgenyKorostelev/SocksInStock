@@ -11,10 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -108,7 +105,7 @@ public class SockServiceImp implements SockService {
         try (BufferedReader bfr = new BufferedReader(new FileReader(path))) {
             while ((line = bfr.readLine()) != null) {
                 socksArr = line.split(",");
-                socks.add(new Sock(socksArr[0], Integer.parseInt(socksArr[1]), Integer.parseInt(socksArr[2])));
+                socks.add(new Sock(null, socksArr[0], Integer.parseInt(socksArr[1]), Integer.parseInt(socksArr[2])));
             }
         } catch (FileNotFoundException e) {
             System.out.println("Ошибка, файл не найден!");
@@ -121,8 +118,22 @@ public class SockServiceImp implements SockService {
     }
 
     private void savingBatchesSocksToBd(List<Sock> socks) {
-        socks.forEach(sock ->
+        List<Sock> socksInBd = this.sockRepository.findAll();
+        for (Sock sockBatche : socks) {
+            Optional<Sock> tempSock = socksInBd.stream()
+                    .filter(o -> o.getColor().equals(sockBatche.getColor()))
+                    .filter(o1 -> Objects.equals(o1.getPercentageCotton(), sockBatche.getPercentageCotton()))
+                    .findFirst();
+            if (tempSock.isEmpty()) {
                 sockRepository.save(new Sock(
-                        null, sock.getColor(), sock.getPercentageCotton(), sock.getPieces())));
+                        null, sockBatche.getColor(), sockBatche.getPercentageCotton(), sockBatche.getPieces()));
+            } else {
+                this.sockRepository.findById(tempSock.get().getId())
+                        .ifPresentOrElse(sock -> sock.setPieces(tempSock.get().getPieces() + sockBatche.getPieces())
+                                , () -> {
+                                    throw new NoSuchElementException();
+                                });
+            }
+        }
     }
 }

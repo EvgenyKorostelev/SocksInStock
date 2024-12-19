@@ -16,6 +16,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.4")
     implementation("org.springframework.boot:spring-boot-starter-validation:3.4.0")
     compileOnly("org.projectlombok:lombok:1.18.36")
+    annotationProcessor ("org.projectlombok:lombok:1.18.36")
 
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(schema = "catalogue", name = "t_sock")
+@Table(schema = "catalogue", name = "t_socks")
 public class Sock {
 
     @Id
@@ -20,15 +20,10 @@ public class Sock {
     @Column(name = "c_color")
     private String color;
 
-    @Column(name = "c_percentageCotton")
+    @Column(name = "c_percentage_cotton")
     private Integer percentageCotton;
 
     @Column(name = "c_pieces")
     private Integer pieces;
 
-    public Sock(String color, Integer percentageCotton, Integer pieces) {
-        this.color = color;
-        this.percentageCotton = percentageCotton;
-        this.pieces = pieces;
-    }
 }

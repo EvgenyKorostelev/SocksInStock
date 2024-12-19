@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SockRepository extends JpaRepository<Sock, Integer> {
 
-    List<Sock> findAllByColorLikeIgnoreCase(String filter);
+    List<Sock> findAllByColorLikeIgnoreCase(String filterColor);
 
-    List<Sock> findAllByPercentageCottonLikeIgnoreCase(String filter);
+//    List<Sock> findAllByPercentageCottonLikeIgnoreCase(String filterCotton);
 }

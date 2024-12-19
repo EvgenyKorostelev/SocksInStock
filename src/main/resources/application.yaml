@@ -1,0 +1,11 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: socks-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/catalogue
+    username: socks
+    password: socks
+  jpa:
+    show-sql: true

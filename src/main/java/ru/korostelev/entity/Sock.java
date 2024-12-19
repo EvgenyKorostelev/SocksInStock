@@ -26,4 +26,9 @@ public class Sock {
     @Column(name = "c_pieces")
     private Integer pieces;
 
+    public Sock(String color, Integer percentageCotton, Integer pieces) {
+        this.color = color;
+        this.percentageCotton = percentageCotton;
+        this.pieces = pieces;
+    }
 }

@@ -17,6 +17,7 @@ import ru.korostelev.service.SockServiceImp;
 
 import java.util.*;
 
+
 @RestController
 @RequestMapping("/api/socks/")
 @RequiredArgsConstructor
@@ -28,14 +29,14 @@ public class SockRestController {
 //    @ModelAttribute("sock")
 //    public Sock getSockById(@PathVariable("id") Integer id) {
 //        return this.sockService.findSockById(id)
-//                .orElseThrow(() -> new NoSuchElementException("catalogue.errors.product.not_found"));
+//                .orElseThrow(() -> new NoSuchElementException("catalogue.errors.sock.not_found"));
 //    }
-
-    @ModelAttribute("sock")
-    public List<Sock> getSockByColor(String color) {
-        return this.sockService.findSockByColor(color)
-                .orElseThrow(() -> new NoSuchElementException("catalogue.errors.product.not_found"));
-    }
+//
+//    @ModelAttribute("sock")
+//    public List<Sock> getSockByColor(String color) {
+//        return this.sockService.findSockByColor(color)
+//                .orElseThrow(() -> new NoSuchElementException("catalogue.errors.sock.not_found"));
+//    }
 
 
     //    Получение общего количества носков с фильтрацией:
@@ -57,6 +58,7 @@ public class SockRestController {
 //    POST /api/socks/income
 //    Параметры: цвет носков, процентное содержание хлопка, количество.
 //    Увеличивает количество носков на складе.
+
     @PostMapping("income")
     public ResponseEntity<?> incomeSock(@Valid @RequestBody NewSockPayload payload,
                                         BindingResult bindingResult)
@@ -68,7 +70,7 @@ public class SockRestController {
                 throw new BindException(bindingResult);
             }
         } else {
-            Optional<Sock> tempSock = getSockByColor(payload.color()).stream().filter(sock ->
+            Optional<Sock> tempSock = sockService.findSockByColor(payload.color()).get().stream().filter(sock ->
                     Objects.equals(sock.getPercentageCotton(), payload.percentageCotton())).findAny();
             if (tempSock.isEmpty()) {
                 this.sockService.createSock(
@@ -97,7 +99,7 @@ public class SockRestController {
                 throw new BindException(bindingResult);
             }
         } else {
-            Sock sock = getSockByColor(payload.color()).stream().filter(o ->
+            Sock sock = sockService.findSockByColor(payload.color()).get().stream().filter(o ->
                     Objects.equals(o.getPercentageCotton(), payload.percentageCotton())).toList().get(0);
             this.sockService.updateSock(sock.getId(),
                     payload.color(), payload.percentageCotton(), payload.pieces());

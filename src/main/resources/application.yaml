@@ -4,8 +4,14 @@ spring:
   application:
     name: socks-service
   datasource:
+# docker run --name socks-db -p 5432:5432 -e POSTGRES_DB=catalogue
+#  -e POSTGRES_USER=socks -e POSTGRES_PASSWORD=socks postgres:16
     url: jdbc:postgresql://localhost:5432/catalogue
     username: socks
     password: socks
   jpa:
     show-sql: true
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: sock-service-swagger-ui

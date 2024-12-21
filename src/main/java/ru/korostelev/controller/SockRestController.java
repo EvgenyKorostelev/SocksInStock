@@ -70,7 +70,8 @@ public class SockRestController {
                 throw new BindException(bindingResult);
             }
         } else {
-            Optional<Sock> tempSock = sockService.findSockByColor(payload.color()).get().stream().filter(sock ->
+            Optional<Sock> tempSock = sockService.findSockByColor(payload.color()).orElse(new ArrayList<>())
+                    .stream().filter(sock ->
                     Objects.equals(sock.getPercentageCotton(), payload.percentageCotton())).findAny();
             if (tempSock.isEmpty()) {
                 this.sockService.createSock(

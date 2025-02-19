@@ -22,6 +22,8 @@ public class SockServiceImp implements SockService {
 
     @Override
     public List<Sock> findAllSocks(String filterColor, String filterCotton, String comparisonOperator) {
+        if(filterColor == null) filterColor = "";
+        if(filterCotton == null) filterCotton = "";
         if (!filterColor.isBlank() && filterCotton.isBlank()) {
             return this.sockRepository.findAllByColorLikeIgnoreCase("%" + filterColor + "%");
         } else if (filterColor.isBlank() && !filterCotton.isBlank()) {
